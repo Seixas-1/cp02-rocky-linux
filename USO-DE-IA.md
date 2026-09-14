@@ -14,7 +14,7 @@ permitido **como apoio**, desde que declarado aqui.
 | Data | Integrante | Ferramenta | Onde foi usada | O que foi feito com o resultado |
 |---|---|---|---|---|
 | 2026-09-10 | Enzo Seixas | Claude (Anthropic) | Estrutura inicial do repositório, esqueleto do `INSTALL.md`, rascunho do `user-audit.sh`, esboço da pesquisa | Revisado pelo grupo; script testado na VM e validado com `shellcheck`; comandos conferidos contra a documentação oficial |
-| | | | | |
+| 2026-09-14 | Enzo Seixas | Claude (Anthropic) | Redação das seções 1 a 9 do documento de pesquisa | Fontes primárias abertas e conferidas uma a uma; datas, versões e números verificados contra os anúncios oficiais; seções 10 e 11 dependem da parte prática e serão escritas pelo grupo |
 | | | | | |
 
 ---
