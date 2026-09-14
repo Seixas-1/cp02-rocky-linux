@@ -9,12 +9,12 @@ recebe a nota de apresentação). Desconto de **−2 pontos por minuto excedido*
 
 | Bloco | Tempo | Conteúdo | Responsável |
 |---|---|---|---|
-| 1 | **4 min** | Abertura e distribuição — quem mantém o Rocky, ciclo de vida, quando escolher | _(preencher)_ |
-| 2 | **5 min** | Esquema de particionamento — o diagrama e a justificativa de cada decisão | _(preencher)_ |
-| 3 | **7 min** | Instalação com LVM e LUKS — ao vivo ou vídeo acelerado, comentando os pontos críticos | _(preencher)_ |
-| 4 | **6 min** | Serviço SSH endurecido — acesso por chave funcionando **e** tentativa bloqueada | _(preencher)_ |
-| 5 | **5 min** | Script `user-audit.sh` — arquitetura e execução ao vivo com saída real | _(preencher)_ |
-| 6 | **3 min** | As cinco perguntas aplicadas à turma | _(preencher)_ |
+| 1 | **4 min** | Abertura e distribuição — quem mantém o Rocky, ciclo de vida, quando escolher | Enzo Seixas |
+| 2 | **5 min** | Esquema de particionamento — o diagrama e a justificativa de cada decisão | João Pedro Ribeiro |
+| 3 | **7 min** | Instalação com LVM e LUKS — ao vivo ou vídeo acelerado, comentando os pontos críticos | João Pedro Ribeiro |
+| 4 | **6 min** | Serviço SSH endurecido — acesso por chave funcionando **e** tentativa bloqueada | Guilherme Benjamin |
+| 5 | **5 min** | Script `user-audit.sh` — arquitetura e execução ao vivo com saída real | Pedro Rossi |
+| 6 | **3 min** | As cinco perguntas aplicadas à turma | João Iudi e Luana Godoy |
 
 Total: **30 min**.
 

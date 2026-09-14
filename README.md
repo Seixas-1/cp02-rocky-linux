@@ -14,11 +14,12 @@ Instalação segura de Rocky Linux com **LVM sobre LUKS**, endurecimento do serv
 
 | Nome | RM | Responsabilidade principal |
 |---|---|---|
-| _(preencher)_ | | Repositório e guia de instalação |
-| _(preencher)_ | | Particionamento, LUKS e LVM |
-| _(preencher)_ | | Serviço SSH e firewalld |
-| _(preencher)_ | | Script `user-audit.sh` |
-| _(preencher)_ | | Pesquisa e apresentação |
+| Enzo Seixas | 572294 | Repositório GitHub e documentação |
+| João Pedro Ribeiro | 570090 | Particionamento, LUKS/LVM e vídeo da instalação |
+| Guilherme Benjamin | 573724 | Configuração do serviço SSH e firewalld |
+| Pedro Rossi | 571590 | Script `user-audit.sh` |
+| João Iudi | 573667 | Apresentação — slides `.pptx` |
+| Luana Godoy | 562776 | Apresentação — slides `.pptx` |
 
 > Todos os integrantes apresentam alguma parte (exigência da rubrica) e todos
 > devem ter commits próprios no histórico.
