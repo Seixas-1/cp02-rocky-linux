@@ -8,7 +8,7 @@ Grupo 2 — Rocky Linux
 |---|---|
 | Enzo Seixas | 572294 |
 | João Pedro Ribeiro | 570090 |
-| Guilherme Benjamin | 573724 |
+| Guilherme Benjamim | 573724 |
 | Pedro Rossi | 571590 |
 | João Iudi | 573667 |
 | Luana Godoy | 562776 |
