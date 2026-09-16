@@ -141,6 +141,102 @@ explicar o mecanismo não pontua.
 
 ---
 
+# Perguntas extras (Q6–Q10) — apresentadas por João Iudi e Luana Godoy
+
+> Mesmo critério das anteriores: respondíveis apenas com o conteúdo dos blocos 1
+> a 5, com as alternativas incorretas plausíveis.
+
+## Questão 6 — múltipla escolha
+
+A RESF adota a regra de que **nenhuma empresa** pode ocupar mais de um terço do
+conselho. Que problema concreto essa regra busca evitar?
+
+- **a)** Que o projeto perca a compatibilidade binária com o RHEL.
+- **b)** Que uma única empresa decida sozinha o rumo do projeto — foi o que
+  encerrou o CentOS Linux.
+- **c)** Que faltem recursos financeiros para manter o suporte de 10 anos.
+- **d)** Que o Peridot deixe de ser um build system auditável.
+
+**Gabarito: b.**
+
+**Comentário:** a governança de fundação é a resposta direta ao caso CentOS, em
+que uma empresa inverteu o modelo sozinha. As outras confundem governança com
+compatibilidade **(a)**, custo **(c)** e ferramenta de build **(d)**.
+
+---
+
+## Questão 7 — múltipla escolha
+
+O Rocky busca **bug-for-bug compatibility** com o RHEL. O que isso significa na
+prática?
+
+- **a)** O Rocky corrige, antes do RHEL, os bugs que encontra.
+- **b)** O Rocky é apenas *parecido* com o RHEL, com pacotes equivalentes.
+- **c)** Se o RHEL tem um bug, o Rocky reproduz o mesmo comportamento — para
+  garantir 100% de paridade de ABI/API.
+- **d)** O Rocky recebe as mudanças antes do RHEL, como vitrine de testes.
+
+**Gabarito: c.**
+
+**Comentário:** a meta é ser idêntico, não melhor nem parecido — assim software
+certificado para RHEL roda igual. A alternativa **(d)** descreve o CentOS Stream
+(upstream), o oposto do papel do Rocky.
+
+---
+
+## Questão 8 — múltipla escolha
+
+Ao trocar a porta padrão do SSH, por que **só** liberar a nova porta no
+`firewalld` não basta no Rocky?
+
+- **a)** Porque o SELinux, em enforcing, bloqueia o sshd de escutar numa porta
+  sem o rótulo correto — é preciso registrá-la com `semanage port`.
+- **b)** Porque o `firewalld` só aceita portas registradas no `/etc/services`.
+- **c)** Porque a nova porta precisa também ser adicionada ao grupo
+  `AllowGroups`.
+- **d)** Porque o `sshd` exige reinicialização completa da VM para trocar de
+  porta.
+
+**Gabarito: a.**
+
+**Comentário:** no Rocky o SELinux vem em enforcing; sem o rótulo da porta o
+serviço não sobe nela. **(c)** mistura porta com controle de usuários; **(b)** e
+**(d)** são plausíveis, mas falsas.
+
+---
+
+## Questão 9 — dissertativa curta
+
+Por que a regra de sempre rodar `sshd -t` (e testar numa **sessão paralela**)
+antes de recarregar a configuração do SSH é especialmente importante num servidor
+**remoto**?
+
+**Resposta esperada:** porque um erro de sintaxe ou uma regra restritiva demais
+só se manifesta ao recarregar, e num servidor remoto o próprio administrador pode
+ser barrado — perdendo o único caminho de acesso para desfazer. Validar antes e
+manter uma sessão aberta em paralelo garante uma rota de volta.
+
+**O que valorizar na correção:** identificar o risco de **se trancar para fora**.
+Resposta genérica ("é mais seguro") não pontua.
+
+---
+
+## Questão 10 — dissertativa curta
+
+Um administrador com carga sem SLA contratual pergunta se deve pagar a subscrição
+do RHEL ou usar o Rocky. Com base no que foi apresentado, justifique a
+recomendação em até três linhas.
+
+**Resposta esperada:** para essa carga o Rocky entrega o **mesmo binário**, com
+10 anos de suporte e certificações RHEL válidas, sem custo de licença; o RHEL
+pago só se justifica quando há necessidade de suporte comercial direto, patch de
+kernel sem reboot (kpatch) ou SLA. Logo, recomenda-se **Rocky**.
+
+**O que valorizar na correção:** condicionar a escolha ao critério de
+**suporte/SLA**, não a "ser de graça".
+
+---
+
 ## Controle de entrega
 
 - [ ] Um slide com a pergunta, o slide seguinte com a resposta comentada
