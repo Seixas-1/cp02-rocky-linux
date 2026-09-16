@@ -15,12 +15,12 @@ permitido **como apoio**, desde que declarado aqui.
 |---|---|---|---|---|
 | 2026-09-10 | Enzo Seixas | Claude (Anthropic) | Estrutura inicial do repositório, esqueleto do `INSTALL.md`, rascunho do `user-audit.sh`, esboço da pesquisa | Revisado pelo grupo; script testado na VM e validado com `shellcheck`; comandos conferidos contra a documentação oficial |
 | 2026-09-14 | Enzo Seixas | Claude (Anthropic) | Redação das seções 1 a 9 do documento de pesquisa | Fontes primárias abertas e conferidas uma a uma; datas, versões e números verificados contra os anúncios oficiais; seções 10 e 11 dependem da parte prática e serão escritas pelo grupo |
-| — | Enzo Seixas | IA generativa | Finalização do repositório GitHub e documentação geral do projeto | Conteúdo revisado pelo grupo; comandos e afirmações conferidos contra a documentação oficial |
-| — | Pedro Rossi | IA generativa | Script `user-audit.sh` — escalonamento das demais funções a partir de um script de *briefing* próprio (`cut -d: -f3 /etc/passwd \| sort -n \| uniq -d`) para coletar e comparar UIDs duplicados e senhas, com base nos módulos RH124/RH134 | Revisado e testado na VM; comandos fora do escopo do aprendizado (ex.: `awk`) foram criticados e removidos/substituídos por comandos vistos em aula |
-| — | João Pedro Ribeiro | IA generativa | Roteiro do vídeo da instalação e auxílio em partes práticas (ex.: particionamento) | Usado como apoio; procedimento executado e conferido na VM do grupo |
-| — | Guilherme Benjamin | IA generativa | Roteiro das tarefas de responsabilidade (SSH/firewalld) e passo a passo de instalação sem erros | Usado como apoio; configuração aplicada e testada na VM do grupo |
-| — | João Iudi | IA do Canva | Apresentação (slides `.pptx`) | Apenas para finalização e acabamento visual; conteúdo definido pelo grupo |
-| — | Luana Godoy | IA do Canva | Apresentação (slides `.pptx`) | Apenas para finalização e acabamento visual; conteúdo definido pelo grupo |
+| 2026-09-12 | Enzo Seixas | IA generativa | Finalização do repositório GitHub e documentação geral do projeto | Conteúdo revisado pelo grupo; comandos e afirmações conferidos contra a documentação oficial |
+| 2026-09-12 | Pedro Rossi | IA generativa | Script `user-audit.sh` — escalonamento das demais funções a partir de um script de *briefing* próprio (`cut -d: -f3 /etc/passwd \| sort -n \| uniq -d`) para coletar e comparar UIDs duplicados e senhas, com base nos módulos RH124/RH134 | Revisado e testado na VM; comandos fora do escopo do aprendizado (ex.: `awk`) foram criticados e removidos/substituídos por comandos vistos em aula |
+| 2026-09-12 | João Pedro Ribeiro | IA generativa | Roteiro do vídeo da instalação e auxílio em partes práticas (ex.: particionamento) | Usado como apoio; procedimento executado e conferido na VM do grupo |
+| 2026-09-12 | Guilherme Benjamin | IA generativa | Roteiro das tarefas de responsabilidade (SSH/firewalld) e passo a passo de instalação sem erros | Usado como apoio; configuração aplicada e testada na VM do grupo |
+| 2026-09-12 | João Iudi | IA do Canva | Apresentação (slides `.pptx`) | Apenas para finalização e acabamento visual; conteúdo definido pelo grupo |
+| 2026-09-12 | Luana Godoy | IA do Canva | Apresentação (slides `.pptx`) | Apenas para finalização e acabamento visual; conteúdo definido pelo grupo |
 
 ---
 
