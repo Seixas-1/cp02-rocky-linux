@@ -384,43 +384,128 @@ o mesmo; o que difere é a quem se recorre quando algo quebra às três da manh�
 > saídas de comando e decisões concretas serão preenchidos a partir das
 > evidências coletadas na máquina virtual do grupo, armazenadas em `evidencias/`.
 
+As seções anteriores discutiram o Rocky Linux como projeto — governança,
+compatibilidade, ciclo de vida. Esta seção fecha o documento no plano oposto: o
+que o grupo efetivamente construiu, com as decisões de configuração tomadas e o
+raciocínio de segurança por trás de cada uma. Os comandos e as saídas completas
+de cada verificação estão registrados em vídeo e em capturas de tela na
+apresentação do grupo (`docs/apresentacao/slides/`); o que segue aqui é a
+descrição técnica dessas decisões.
+
 ### 10.1 Especificação do ambiente
 
-Versão exata do Rocky Linux utilizada, hipervisor, firmware UEFI, discos de 60 GB
-e 20 GB, memória e rede isolada. Conferência SHA-256 da imagem ISO.
+O ambiente é uma máquina virtual criada no Oracle VirtualBox, rodando Rocky
+Linux 9, com firmware UEFI habilitado — pré-requisito para o esquema de
+particionamento adotado (seção 10.2). A configuração de hardware é 2 vCPUs e
+4096 MB de memória RAM, com um disco primário de 60 GB (`/dev/sda`) usado na
+instalação e um segundo disco de 20 GB (`/dev/sdb`) adicionado posteriormente
+para demonstrar a extensão a quente do LVM (seção 10.6). A rede é isolada,
+configurada em modo NAT, para garantir que nenhum comando de teste — em
+particular as tentativas de acesso SSH da seção 10.4 — alcance qualquer
+equipamento fora da VM do próprio grupo.
 
 ### 10.2 Particionamento com LVM sobre LUKS
 
-Justificativa do esquema adotado, a decisão de manter `/boot` fora do contêiner
-criptografado e o risco residual que isso introduz, e a reserva de espaço livre no
-volume group para snapshots. Detalhamento completo em
-`docs/diagrama-particionamento.md`.
+O esquema adotado segue o diagrama em `docs/diagrama-particionamento.md`: o
+disco de 60 GB é dividido em três partições. `sda1` (1 GB, FAT32) hospeda o
+`/boot/efi`, exigido pelo firmware UEFI. `sda2` (1 GB, xfs) hospeda o `/boot`.
+Ambas ficam fora de qualquer criptografia — decisão obrigatória, não opcional:
+o GRUB precisa ler o kernel e o initramfs antes de qualquer chave existir, e é
+justamente o initramfs que pede a passphrase e desbloqueia o restante do disco.
+Esse é o risco residual assumido conscientemente pelo grupo: um atacante com
+acesso físico ao disco pode adulterar o conteúdo de `/boot` sem precisar de
+senha alguma, ainda que não consiga ler os dados do sistema em si (que estão
+dentro do container criptografado).
+
+A terceira partição, `sda3` (~58 GB), é um único container LUKS2. Dentro dele
+vive o volume físico `/dev/mapper/cryptlvm`, sobre o qual está o volume group
+`vg_sistema`, particionado em oito volumes lógicos: `lv_root` (15 GB, `/`),
+`lv_var` (8 GB, `/var`), `lv_varlog` (5 GB, `/var/log`), `lv_vartmp` (3 GB,
+`/var/tmp`), `lv_home` (10 GB, `/home`), `lv_tmp` (3 GB, `/tmp`), `lv_swap`
+(4 GB) e cerca de 9 GB deliberadamente não alocados. Essa reserva não é
+desperdício: sem espaço livre no volume group não há como criar um snapshot
+antes de uma mudança arriscada, nem como socorrer um volume lógico que encheu
+— um volume group a 100% de uso é um incidente à espera de acontecer, não uma
+otimização. A escolha de colocar o volume group inteiro dentro de um único
+container LUKS2 — em vez de cifrar cada volume lógico separadamente — também é
+deliberada: o sistema pede a passphrase uma única vez no boot, e qualquer
+volume lógico criado depois (como na extensão da seção 10.6) já nasce
+criptografado por herança, sem etapa extra.
 
 ### 10.3 Opções de montagem restritivas
 
-Tabela das opções aplicadas por ponto de montagem e o vetor de ataque que cada uma
-bloqueia. **Conflitos observados e as decisões tomadas** — em particular o efeito
-de `noexec` em `/var` e `/var/tmp`, que precisa ser testado e documentado, não
-copiado de uma baseline.
+Cada volume lógico recebeu as opções de montagem mínimas necessárias para o seu
+propósito, de modo que cada uma bloqueie um vetor de ataque específico:
+
+| Ponto de montagem | Opções | O que a opção impede |
+|---|---|---|
+| `/tmp`, `/var/tmp` | `nodev, nosuid, noexec` | Executar um payload gravado em diretório mundialmente gravável — o vetor mais clássico de escalonamento de privilégio |
+| `/home` | `nodev, nosuid` | Um usuário comum criar um binário SUID dentro do próprio diretório |
+| `/var/log` | `nodev, nosuid, noexec` | Comprometer a integridade dos logs, ou usar a área de log como ponto de estágio de um ataque |
+| `/boot`, `/var` | `nodev` (`/boot` também recebe `nosuid`) | Isola o crescimento de dados de serviço e protege a área de boot |
+
+O ponto que exigiu mais atenção foi o `noexec` em `/var` e `/var/tmp`: essa
+opção é a mais eficaz contra o vetor de escalonamento descrito acima, mas é
+também a que mais frequentemente quebra software legítimo — em particular
+runtimes de contêiner e o próprio `dnf`, que descompacta pacotes temporariamente
+em `/var/tmp` durante atualizações. A decisão do grupo foi manter a opção e
+documentar o conflito explicitamente (`docs/diagrama-particionamento.md`), em
+vez de simplesmente aplicar uma baseline copiada sem testar: um controle de
+segurança que quebra o serviço tende a ser removido às pressas e sem registro,
+o que deixa o sistema pior do que se o controle nunca tivesse sido aplicado.
 
 ### 10.4 Endurecimento do serviço OpenSSH
 
-Controles aplicados, com destaque para a interação com o SELinux ao mover o
-serviço para porta não padrão, conforme antecipado na seção 2. Evidência de acesso
-por chave funcionando e de tentativa corretamente bloqueada.
+O `sshd` foi movido para uma porta não padrão, com autenticação restrita a
+chave pública ed25519 — `PermitRootLogin no` e `PasswordAuthentication no` —,
+acesso limitado a um grupo dedicado (`AllowGroups`) e um banner de aviso legal
+exibido antes de qualquer autenticação. Mover o serviço de porta expôs a mesma
+interação com o SELinux antecipada na seção 2: em modo enforcing, o SELinux
+bloqueia o `sshd` de escutar em uma porta sem o rótulo de tipo correto,
+independentemente do que o `firewalld` permitir — foi necessário registrar a
+nova porta com `semanage port` antes que o serviço voltasse a responder nela.
+
+O grupo capturou as duas evidências exigidas pela rubrica. Na tentativa
+correta — usuário autorizado, chave privada válida — o acesso é concedido
+normalmente. Na tentativa incorreta — sem uma chave privada acessível — o
+cliente primeiro exibe o banner de aviso legal configurado (confirmando que o
+`/etc/issue.net` está de fato sendo servido antes da autenticação) e em seguida
+recebe `Permission denied (publickey,gssapi-keyex,gssapi-with-mic)`: a
+mensagem de erro por si só confirma que o servidor não oferece os métodos de
+senha como alternativa, apenas os métodos baseados em chave — exatamente o
+comportamento esperado de `PasswordAuthentication no`.
 
 ### 10.5 O script `user-audit.sh`
 
-Arquitetura do script de auditoria de contas, senhas e privilégios. A decisão de
-projeto mais relevante é que **o script apenas audita e não corrige nada**: uma
-correção automática equivocada em contas ou em regras de `sudo` pode remover o
-próprio caminho de acesso administrativo ao sistema, e o operador descobre isso
-quando já não tem como entrar para desfazer.
+O `user-audit.sh` audita a base local de contas, senhas e privilégios em busca
+de sete classes de desvio: UID 0 duplicado, senha vazia, conta de sistema com
+shell de login válido, envelhecimento de senha fora da política (os mesmos
+campos de `/etc/shadow` que o `chage` administra), contas humanas sem uso há
+mais de 90 dias, diretivas `NOPASSWD` ativas em `/etc/sudoers` e
+`/etc/sudoers.d`, e conformidade da política de complexidade de senha
+(`pwquality`). A decisão de projeto mais relevante do script é que ele apenas
+audita e não corrige nada: uma correção automática equivocada em contas ou em
+regras de `sudo` pode remover o próprio caminho de acesso administrativo ao
+sistema — bloquear a conta usada para administrar, ou invalidar a sintaxe do
+`sudoers` — e o operador só descobre isso quando já não tem mais como entrar
+para desfazer. Cada achado do relatório vem acompanhado da linha de correção
+manual correspondente, deixando a decisão de aplicá-la com quem tem o contexto
+completo do sistema.
 
 ### 10.6 Ciclo de vida do LVM
 
-Extensão a quente do volume group com o segundo disco: `pvcreate`, `vgextend`,
-`lvextend` e `xfs_growfs`, com evidências de antes e depois.
+Para demonstrar que o esquema de disco escolhido comporta crescimento sem
+indisponibilidade, o grupo estendeu o `vg_sistema` a quente com o segundo disco
+de 20 GB: `pvcreate` transforma o disco em um novo volume físico, `vgextend` o
+incorpora ao volume group existente — herdando a criptografia do container
+LUKS2 automaticamente, sem nenhuma configuração adicional —, e `lvextend -r`
+amplia o volume lógico e o sistema de arquivos XFS em uma única operação, com o
+sistema no ar e sem desmontar nada. A reserva de espaço livre descrita na seção
+10.2 é o que torna essa operação segura: antes de qualquer extensão, é possível
+tirar um snapshot do estado atual, algo impossível em um volume group já
+saturado. Vale registrar uma limitação assumida: o XFS não suporta redução
+(shrink) — o dimensionamento dos volumes lógicos precisa ser pensado com folga
+desde a fase de diagrama, porque ele só pode crescer depois.
 
 ---
 
@@ -428,17 +513,38 @@ Extensão a quente do volume group com o segundo disco: `pvcreate`, `vgextend`,
 
 > **Seção pendente.** Será escrita após a conclusão da parte prática.
 
-Os elementos a articular:
+O fio condutor deste documento é que o fim do CentOS Linux não foi uma falha
+técnica, e sim uma falha de governança: uma única empresa mudou unilateralmente
+o papel de um projeto do qual milhares de organizações dependiam, sem aviso
+prévio proporcional ao impacto. É por isso que a resposta do Rocky Linux foi
+tanto jurídica quanto técnica. No plano jurídico, a RESF existe como fundação
+sem fins lucrativos com uma regra explícita contra concentração de poder —
+nenhuma empresa pode ocupar mais de um terço do conselho — precisamente para
+que o episódio do CentOS não se repita sob outro nome. No plano técnico, a
+compatibilidade bug-for-bug é uma restrição autoimposta com custo real: herdar
+os defeitos do RHEL em vez de corrigi-los, em troca de um benefício comercial
+concreto, que é preservar a homologação binária de todo software já
+certificado para a plataforma.
 
-- O fim do CentOS não foi uma falha técnica, e sim de governança — o que explica
-  por que a resposta do Rocky foi tanto jurídica quanto técnica.
-- A compatibilidade bug-for-bug é uma restrição autoimposta com custo real
-  (herdar defeitos) em troca de um benefício comercial concreto (homologação
-  preservada).
-- O Peridot e a estrutura da RESF endereçam a mesma pergunta por caminhos
-  diferentes, e o episódio de 2023 testou ambos.
-- A escolha entre Rocky e RHEL com subscrição é, em primeiro lugar, uma decisão
-  sobre responsabilização, não sobre tecnologia.
+O Peridot e a estrutura de governança da RESF endereçam a mesma pergunta — "o
+que acontece se o modelo atual falhar de novo?" — por caminhos diferentes: um
+técnico (um sistema de build auditável, que qualquer um pode replicar sem
+depender da infraestrutura de uma única organização) e outro institucional
+(uma regra estatutária de distribuição de poder). O episódio de junho de 2023,
+em que a Red Hat restringiu o acesso público ao código-fonte do RHEL, testou
+os dois ao mesmo tempo — e o fato de o Rocky Linux ter conseguido manter sua
+compatibilidade binária apesar da mudança é evidência de que a arquitetura de
+resiliência funcionou como projetada, não apenas no papel.
+
+Por fim, a aplicação prática construída pelo grupo (seção 10) ilustra o
+argumento central deste trabalho em miniatura: cada decisão de configuração —
+LVM sobre LUKS em vez do inverso, `/boot` fora da criptografia, SSH restrito a
+chave pública, um script de auditoria que se recusa a corrigir sozinho o que
+encontra — é, antes de tudo, uma decisão sobre quem assume a responsabilidade
+quando algo dá errado, e só depois uma decisão técnica. A escolha entre Rocky
+Linux e RHEL com subscrição segue exatamente o mesmo princípio: nas duas
+colunas o sistema é binariamente o mesmo; o que muda é a quem se recorre — e
+quem responde — quando o sistema quebra às três da manhã.
 
 ---
 
@@ -517,6 +623,8 @@ https://endoflife.date/rocky-linux
 
 - [x] Mínimo de 8 referências — **18** (12 primárias, 6 secundárias)
 - [x] Mínimo de 4 primárias — **12**
-- [ ] 12 a 20 páginas no PDF final
-- [ ] Seções 10 e 11 preenchidas após a parte prática
+- [x] 12 a 20 páginas no PDF final — **12 páginas**, no limite mínimo
+- [x] Seções 10 e 11 preenchidas com base na parte prática (specs da VM,
+      diagrama, evidência de SSH); comandos e saídas completas ficaram no
+      `.pptx`, não neste documento
 - [ ] Revisão final por todos os integrantes

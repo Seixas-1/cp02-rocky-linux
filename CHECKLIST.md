@@ -36,14 +36,17 @@ Data da apresentação (D-0): **__/__/____**
 
 ## Entregável 01 — Documento de pesquisa (8 pts)
 
-- [ ] PDF com **12 a 20 páginas** — **PDF gerado** em `docs/pesquisa/documento.pdf`,
-      mas saiu com **10 páginas** (2 abaixo do mínimo); tende a crescer quando as
-      seções 10 e 11 (hoje "pendentes") forem escritas com a parte prática
+- [x] PDF com **12 a 20 páginas** — `docs/pesquisa/documento.pdf` tem **12
+      páginas** (no limite mínimo, sem folga); as seções 10 e 11 foram escritas
+      usando os dados reais já disponíveis (specs da VM, diagrama, evidência de
+      SSH). Se quiser mais margem acima do mínimo, dá pra detalhar mais a seção 10
 - [x] **Mínimo 8 referências**, sendo **4 primárias** — `documento.md` tem 18 (12
       primárias); **`referencias.md` está desatualizado**, ver aviso abaixo
 - [x] Cobre o recorte do grupo: RESF, *bug-for-bug*, Peridot, fim do CentOS
-- [ ] Toda afirmação tem evidência correspondente em `evidencias/` — depende das
-      seções 10 e 11, marcadas como **pendentes** no próprio documento
+- [ ] Toda afirmação tem evidência correspondente em `evidencias/` — as seções
+      10 e 11 agora estão escritas, mas a evidência que sustenta cada afirmação
+      está no `.pptx` (diagrama, vídeo, print de SSH), não em `evidencias/`,
+      que continua vazia; ver aviso na seção de Evidências obrigatórias abaixo
 
 ## Entregável 02 — Apresentação (15 pts)
 
