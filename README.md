@@ -47,8 +47,11 @@ Instalação segura de Rocky Linux com **LVM sobre LUKS**, endurecimento do serv
 ├── docs/
 │   ├── diagrama-particionamento.md # entregável do marco D-14
 │   ├── apresentacao/
-│   │   ├── roteiro.md              # divisão dos 30 minutos por integrante
-│   │   └── perguntas-gabarito.md   # entregável 05 (gabarito: 48h de antecedência)
+│   │   ├── roteiro.md              # divisão do tempo por integrante (versão de 30 min)
+│   │   ├── falas.md                # roteiro de falas casado com os slides (versão de 15 min)
+│   │   ├── perguntas-gabarito.md   # entregável 05 (gabarito: 48h de antecedência)
+│   │   └── slides/
+│   │       └── Rocky_Linux_Apresentacao.pptx  # slides da apresentação (.pptx editável)
 │   └── pesquisa/
 │       ├── esboco.md               # estrutura do documento de 12 a 20 páginas
 │       └── referencias.md          # mínimo 8 referências, 4 primárias
