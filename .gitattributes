@@ -10,3 +10,11 @@
 
 # Documentação
 *.md text
+
+# Binários: nunca aplicar conversão de fim de linha (corromperia o arquivo)
+*.pdf -text binary
+*.pptx -text binary
+*.png -text binary
+*.jpg -text binary
+*.jpeg -text binary
+*.mp4 -text binary
