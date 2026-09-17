@@ -11,7 +11,7 @@ slide. Divisão de tempo e responsáveis seguem o [roteiro](roteiro.md).
 
 ## Bloco 1 — Enzo Seixas · ~2 min · slides 1–7
 
-**[SLIDE 1]** "Boa noite, somos o Grupo 2 e nosso trabalho é sobre o **Rocky
+**[SLIDE 1]** "Bom dia, somos o Grupo 2 e nosso trabalho é sobre o **Rocky
 Linux**. Eu abro com o contexto e depois cada colega assume uma parte prática."
 
 **[SLIDES 4–5]** "O Rocky é mantido pela **RESF**, uma **fundação**, não uma
